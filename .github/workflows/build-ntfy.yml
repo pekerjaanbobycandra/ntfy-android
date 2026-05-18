@@ -1,7 +1,7 @@
 name: Build Cluring Notification APK
 
 on:
-  workflow_dispatch: # Berjalan manual dengan klik tombol di tab Actions
+  workflow_dispatch:
 
 jobs:
   build:
@@ -28,7 +28,10 @@ jobs:
           # 2. Hanya ubah applicationId (identitas luar untuk HP & Firebase)
           sed -i 's/applicationId "io.heckel.ntfy"/applicationId "com.desacluring.hub"/g' app/build.gradle
           
-          # 3. Gembos alamat server default agar otomatis mengarah ke hub.desacluring.com
+          # 3. POTONG BUNTUT: Hapus aturan penambahan .debug agar file Firebase bisa terbaca
+          sed -i 's/applicationIdSuffix ".debug"//g' app/build.gradle
+          
+          # 4. Gembos alamat server default agar otomatis mengarah ke hub.desacluring.com
           find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
 
       - name: Jalankan Proses Perakitan (Play/FCM DEBUG Flavor)
