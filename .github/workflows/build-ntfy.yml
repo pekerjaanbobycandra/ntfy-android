@@ -1,0 +1,44 @@
+name: Build Cluring Notification APK
+
+on:
+  workflow_dispatch: # Berjalan manual dengan klik tombol di tab Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Suntik Firebase & Ubah Identitas Aplikasi (Package ID)
+        run: |
+          # 1. Suntikkan file google-services.json asli milik Desa Cluring ke folder play
+          echo '${{ secrets.FIREBASE_JSON }}' > app/google-services.json
+          echo '${{ secrets.FIREBASE_JSON }}' > app/src/play/google-services.json
+          
+          # 2. Paksa ubah Package ID bawaan (io.heckel.ntfy) menjadi com.desacluring.hub
+          find . -type f -name "build.gradle" -exec sed -i 's/io.heckel.ntfy/com.desacluring.hub/g' {} +
+          find . -type f -name "AndroidManifest.xml" -exec sed -i 's/io.heckel.ntfy/com.desacluring.hub/g' {} +
+          
+          # 3. Gembos alamat server default agar otomatis mengarah ke hub.desacluring.com
+          find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
+
+      - name: Jalankan Proses Perakitan (Play/FCM Flavor)
+        run: |
+          chmod +x gradlew
+          ./gradlew assemblePlayRelease --no-daemon
+
+      - name: Upload Hasil APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cluring-ntfy-release
+          path: app/build/outputs/apk/play/release/*.apk
