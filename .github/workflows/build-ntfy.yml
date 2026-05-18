@@ -25,20 +25,19 @@ jobs:
           echo '${{ secrets.FIREBASE_JSON }}' > app/google-services.json
           echo '${{ secrets.FIREBASE_JSON }}' > app/src/play/google-services.json
           
-          # 2. TRIK AMAN: Hanya ubah applicationId (identitas luar untuk HP & Firebase)
-          # Tanpa merusak struktur paket internal agar file 'R' tidak rusak
+          # 2. Hanya ubah applicationId (identitas luar untuk HP & Firebase)
           sed -i 's/applicationId "io.heckel.ntfy"/applicationId "com.desacluring.hub"/g' app/build.gradle
           
           # 3. Gembos alamat server default agar otomatis mengarah ke hub.desacluring.com
           find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
 
-      - name: Jalankan Proses Perakitan (Play/FCM Flavor)
+      - name: Jalankan Proses Perakitan (Play/FCM DEBUG Flavor)
         run: |
           chmod +x gradlew
-          ./gradlew assemblePlayRelease --no-daemon
+          ./gradlew assemblePlayDebug --no-daemon
 
       - name: Upload Hasil APK
         uses: actions/upload-artifact@v4
         with:
-          name: cluring-ntfy-release
-          path: app/build/outputs/apk/play/release/*.apk
+          name: cluring-ntfy-debug
+          path: app/build/outputs/apk/play/debug/*.apk
