@@ -19,28 +19,38 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Suntik Firebase & Ubah Identitas Aplikasi (Package ID)
+      - name: Persiapkan Rahasia & Identitas Aplikasi
         run: |
-          # 1. Suntikkan file google-services.json asli milik Desa Cluring ke folder play
+          # 1. Suntik Firebase
           echo '${{ secrets.FIREBASE_JSON }}' > app/google-services.json
           echo '${{ secrets.FIREBASE_JSON }}' > app/src/play/google-services.json
           
-          # 2. Hanya ubah applicationId (identitas luar untuk HP & Firebase)
-          sed -i 's/applicationId "io.heckel.ntfy"/applicationId "com.desacluring.hub"/g' app/build.gradle
+          # 2. Bangkitkan kembali file Keystore dari teks rahasia
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/cluring-release.keystore
           
-          # 3. POTONG BUNTUT: Hapus aturan penambahan .debug agar file Firebase bisa terbaca
+          # 3. UBAH NAMA APLIKASI MENJADI "Notif Desa Cluring"
+          find app/src/main/res -name "strings.xml" -exec sed -i 's/>ntfy</>Notif Desa Cluring</g' {} +
+          
+          # 4. Ubah identitas luar (Application ID) & buang buntut debug
+          sed -i 's/applicationId "io.heckel.ntfy"/applicationId "com.desacluring.hub"/g' app/build.gradle
           sed -i 's/applicationIdSuffix ".debug"//g' app/build.gradle
           
-          # 4. Gembos alamat server default agar otomatis mengarah ke hub.desacluring.com
+          # 5. Gembos alamat server default
           find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
 
-      - name: Jalankan Proses Perakitan (Play/FCM DEBUG Flavor)
+      - name: Jalankan Proses Perakitan (Play/FCM RELEASE Flavor)
         run: |
           chmod +x gradlew
-          ./gradlew assemblePlayDebug --no-daemon
+          # Menjalankan build rilis dengan menyuntikkan Keystore rahasia
+          ./gradlew assemblePlayRelease \
+            -Pandroid.injected.signing.store.file=$(pwd)/app/cluring-release.keystore \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }} \
+            --no-daemon
 
-      - name: Upload Hasil APK
+      - name: Upload Hasil APK Resmi
         uses: actions/upload-artifact@v4
         with:
-          name: cluring-ntfy-debug
-          path: app/build/outputs/apk/play/debug/*.apk
+          name: Notif-Desa-Cluring-Release
+          path: app/build/outputs/apk/play/release/*.apk
