@@ -28,8 +28,8 @@ jobs:
           # 2. Bangkitkan kembali file Keystore dari teks rahasia
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/cluring-release.keystore
           
-          # 3. UBAH NAMA APLIKASI MENJADI "Notif Desa Cluring"
-          find app/src/main/res -name "strings.xml" -exec sed -i 's/>ntfy</>Notif Desa Cluring</g' {} +
+          # 3. UBAH NAMA APLIKASI MENJADI "Notif Desa Cluring" (Direvisi: Sapu jagat semua file XML)
+          find app/src/main/res -type f -name "*.xml" -exec sed -i 's/>ntfy</>Notif Desa Cluring</g' {} +
           
           # 4. Ubah identitas luar (Application ID) & buang buntut debug
           sed -i 's/applicationId "io.heckel.ntfy"/applicationId "com.desacluring.hub"/g' app/build.gradle
