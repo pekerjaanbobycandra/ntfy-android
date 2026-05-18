@@ -25,9 +25,9 @@ jobs:
           echo '${{ secrets.FIREBASE_JSON }}' > app/google-services.json
           echo '${{ secrets.FIREBASE_JSON }}' > app/src/play/google-services.json
           
-          # 2. Paksa ubah Package ID bawaan (io.heckel.ntfy) menjadi com.desacluring.hub
-          find . -type f -name "build.gradle" -exec sed -i 's/io.heckel.ntfy/com.desacluring.hub/g' {} +
-          find . -type f -name "AndroidManifest.xml" -exec sed -i 's/io.heckel.ntfy/com.desacluring.hub/g' {} +
+          # 2. TRIK AMAN: Hanya ubah applicationId (identitas luar untuk HP & Firebase)
+          # Tanpa merusak struktur paket internal agar file 'R' tidak rusak
+          sed -i 's/applicationId "io.heckel.ntfy"/applicationId "com.desacluring.hub"/g' app/build.gradle
           
           # 3. Gembos alamat server default agar otomatis mengarah ke hub.desacluring.com
           find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
