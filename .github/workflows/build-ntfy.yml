@@ -38,11 +38,8 @@ jobs:
           # 5. Gembos alamat server default
           find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
           
-          # 6. MENYEMBUNYIKAN KOTAK CHAT (Trik Sapu Jagat Anti-Gagal)
-          find app/src/main/res/layout -type f -name "*.xml" -exec sed -i 's|detail_bottom_bar"|detail_bottom_bar" android:visibility="gone"|g' {} +
-          find app/src/main/res/layout -type f -name "*.xml" -exec sed -i 's|detail_input_container"|detail_input_container" android:visibility="gone"|g' {} +
-          find app/src/main/res/layout -type f -name "*.xml" -exec sed -i 's|detail_input_text"|detail_input_text" android:visibility="gone"|g' {} +
-          find app/src/main/res/layout -type f -name "*.xml" -exec sed -i 's|detail_bottom_text"|detail_bottom_text" android:visibility="gone"|g' {} +
+          # 6. DIET KETAT: Hanya pertahankan bahasa ID/EN & buang arsitektur Intel x86/x86_64
+          sed -i '/defaultConfig {/a \        resConfigs "en", "id"\n        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }' app/build.gradle
           
           # 7. MENGUBAH NAMA VERSI (Menjadi Desa Cluring Team - Versi 1.25.0)
           find app/src/main/res -type f -name "*.xml" -exec sed -i 's/%1$s %2$s (%3$s)/Desa Cluring Team - Versi %2$s/g' {} +
