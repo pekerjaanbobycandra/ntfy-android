@@ -38,10 +38,7 @@ jobs:
           # 5. Gembos alamat server default
           find . -type f -name "*.xml" -exec sed -i 's|https://ntfy.sh|https://hub.desacluring.com|g' {} +
           
-          # 6. DIET KETAT: Menyuntikkan filter bahasa (ID/EN) & prosesor ARM tepat di bawah targetSdkVersion 36
-          sed -i '/targetSdkVersion 36/a \        resConfigs "en", "id"\n        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }' app/build.gradle
-          
-          # 7. MENGUBAH NAMA VERSI (Menjadi Desa Cluring Team - Versi 1.25.0)
+          # 6. MENGUBAH NAMA VERSI (Menjadi Desa Cluring Team - Versi 1.25.0)
           find app/src/main/res -type f -name "*.xml" -exec sed -i 's/%1$s %2$s (%3$s)/Desa Cluring Team - Versi %2$s/g' {} +
           find app/src/main/res -type f -name "*.xml" -exec sed -i 's/ntfy %1$s (%2$s)/Desa Cluring Team - Versi %1$s/g' {} +
 
